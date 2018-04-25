@@ -12,9 +12,13 @@ namespace AsyncErrorHandling
             InitializeComponent();
             //btnMain.Click += BtnMainClick_CannotCatchExceptionsFromAsyncVoid_ResultingInUnhandledException_WithSynchronousThrowing;
             //btnMain.Click += BtnMainClick_CannotCatchExceptionsFromAsyncVoid_ResultingInUnhandledException_WithAsynchronousThrowing;
-            //btnMain.Click += BtnMainClick_CanWrapSynchronousVoid_WithTryCatch_NoExceptionLeak;
             //btnMain.Click += BtnMainClick_ThrowingSynchronously_IsStillAnUnhandledException;
+            //btnMain.Click += BtnMainClick_CanWrapSynchronousVoid_WithTryCatch_NoExceptionLeak;
             //btnMain.Click += BtnMainClick_IfExceptionsAreCaughtInsideAsyncVoid_NoExceptionLeak;
+            //btnMain.Click += BtnMainClick_AwaitingReturnedFaultedTask_NoExceptionLeak;
+            //btnMain.Click += BtnMainClick_AwaitingAwaitedFaultedTask_NoExceptionLeak;
+            //btnMain.Click += BtnMainClick_TwoLevelsOfNestedAsyncAwaitCalls_IsStillAnUnhandledExceptions;
+            //btnMain.Click += BtnMainClick_SynchronouslyWaitingForFaultedTaskIsStupidBut_NoExceptionLeak;
             //btnMain.Click += BtnMainClick_Responsive_ButWillThrow_CrossThreadOnlyInDebugMode;
             //btnMain.Click += BtnMainClick_InvokeToTheRescue;
         }
@@ -31,7 +35,7 @@ namespace AsyncErrorHandling
         {
             try
             {
-                ThrowSynchronousExceptionAsync();
+                ThrowSynchronousExceptionInAsyncVoid();
             }
             catch (Exception)
             {
@@ -41,7 +45,7 @@ namespace AsyncErrorHandling
             btnMain.Text = "Will end up here after Unhadled Exception is thrown!";
         }
 
-        private async void ThrowSynchronousExceptionAsync()
+        private async void ThrowSynchronousExceptionInAsyncVoid()
         {
             throw new InvalidOperationException();
         }
@@ -50,7 +54,7 @@ namespace AsyncErrorHandling
         {
             try
             {
-                ThrowAsynchronousExceptionAsync();
+                ThrowAsynchronousExceptionInAsyncVoid();
             }
             catch (Exception)
             {
@@ -60,7 +64,7 @@ namespace AsyncErrorHandling
             btnMain.Text = "Will end up here after Unhadled Exception is thrown!";
         }
 
-        private async void ThrowAsynchronousExceptionAsync()
+        private async void ThrowAsynchronousExceptionInAsyncVoid()
         {
             await Task.Run(() => throw new InvalidOperationException());
         }
@@ -69,7 +73,7 @@ namespace AsyncErrorHandling
         {
             ThrowException();
 
-            btnMain.Text = "Seriously, this in never, ever gonna get hit";
+            btnMain.Text = "Seriously, this is never, ever, gonna get hit!";
         }
 
         private void ThrowException()
@@ -95,26 +99,88 @@ namespace AsyncErrorHandling
         {
             try
             {
-                SafeThrowExceptionAsync();
+                ThrownExceptionCaughtInsideAsyncVoid();
             }
             catch (Exception)
             {
-                // The exception is never caught here!
+                // The exception IS caught here!
             }
 
             btnMain.Text = "We are OK";
         }
 
-        private async void SafeThrowExceptionAsync()
+        private async void ThrownExceptionCaughtInsideAsyncVoid()
         {
             try
             {
                 await Task.Run(() => throw new InvalidOperationException());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //Will get caught
             }
+        }
+
+        private async void BtnMainClick_AwaitingReturnedFaultedTask_NoExceptionLeak(object sender, EventArgs e)
+        {
+            try
+            {
+                await ReturnTaskThatWillBeFaulted();
+            }
+            catch (Exception)
+            {
+                // The exception IS caught here. We good!!!
+            }
+
+            btnMain.Text = "We are OK";
+        }
+
+        private Task ReturnTaskThatWillBeFaulted()
+        {
+            return Task.Run(() => throw new InvalidOperationException());
+        }
+
+        private async void BtnMainClick_AwaitingAwaitedFaultedTask_NoExceptionLeak(object sender, EventArgs e)
+        {
+            try
+            {
+                await AwaitingTaskThatWillBeFaulted();
+            }
+            catch (Exception)
+            {
+                // The exception IS caught here. We good!!!
+            }
+
+            btnMain.Text = "We are OK";
+        }
+
+        private async Task AwaitingTaskThatWillBeFaulted()
+        {
+            await Task.Run(() => throw new InvalidOperationException());
+        }
+
+        private async void BtnMainClick_TwoLevelsOfNestedAsyncAwaitCalls_IsStillAnUnhandledException(object sender, EventArgs e)
+        {
+            await AwaitingTaskThatWillBeFaulted();
+        }
+
+        private void BtnMainClick_SynchronouslyWaitingForFaultedTaskIsStupidBut_NoExceptionLeak(object sender, EventArgs e)
+        {
+            try
+            {
+                SyncronouslyWaintingTaskThatWillBeFaulted();
+            }
+            catch (Exception)
+            {
+                // The exception IS caught here. We good!!!
+            }
+
+            btnMain.Text = "We are OK";
+        }
+
+        private void SyncronouslyWaintingTaskThatWillBeFaulted()
+        {
+            Task.Run(() => throw new InvalidOperationException()).Wait();
         }
 
         private async void BtnMainClick_Responsive_ButWillThrow_CrossThreadOnlyInDebugMode(object sender, EventArgs e)
