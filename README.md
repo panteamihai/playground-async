@@ -6,3 +6,4 @@
 * How does this impact event handlers?
 * Synchronous vs. asynchronous throwing
 * Awaiting faulted tasks
+* Tasks that don't lean on an asynchrony source are executed synchronously
