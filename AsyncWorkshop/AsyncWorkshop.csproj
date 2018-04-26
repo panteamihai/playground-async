@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C63CBE8F-4058-4B9B-B1DB-8FB9F8D51965}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>AsyncErrorHandling</RootNamespace>
-    <AssemblyName>AsyncErrorHandling</AssemblyName>
+    <RootNamespace>AsyncWorkshop</RootNamespace>
+    <AssemblyName>AsyncWorkshop</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -47,16 +47,34 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI.cs">
+    <Compile Include="Execution.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI.Designer.cs">
-      <DependentUpon>UI.cs</DependentUpon>
+    <Compile Include="Execution.Designer.cs">
+      <DependentUpon>Execution.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ContextSwitching.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ContextSwitching.Designer.cs">
+      <DependentUpon>ContextSwitching.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ErrorHandling.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErrorHandling.Designer.cs">
+      <DependentUpon>ErrorHandling.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="UI.resx">
-      <DependentUpon>UI.cs</DependentUpon>
+    <EmbeddedResource Include="Execution.resx">
+      <DependentUpon>Execution.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ContextSwitching.resx">
+      <DependentUpon>ContextSwitching.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ErrorHandling.resx">
+      <DependentUpon>ErrorHandling.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncErrorHandling", "AsyncErrorHandling\AsyncErrorHandling.csproj", "{C63CBE8F-4058-4B9B-B1DB-8FB9F8D51965}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncWorkshop", "AsyncWorkshop\AsyncWorkshop.csproj", "{C63CBE8F-4058-4B9B-B1DB-8FB9F8D51965}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

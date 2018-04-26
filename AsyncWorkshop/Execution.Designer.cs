@@ -1,6 +1,6 @@
-﻿namespace AsyncErrorHandling
+﻿namespace AsyncWorkshop
 {
-    partial class UI
+    partial class Execution
     {
         /// <summary>
         /// Required designer variable.
@@ -31,27 +31,27 @@
             this.btnMain = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
-            // 
+            //
             // btnMain
-            // 
+            //
             this.btnMain.Location = new System.Drawing.Point(12, 12);
             this.btnMain.Name = "btnMain";
             this.btnMain.Size = new System.Drawing.Size(355, 102);
             this.btnMain.TabIndex = 0;
             this.btnMain.Text = "Click it!";
             this.btnMain.UseVisualStyleBackColor = true;
-            // 
+            //
             // txtMessage
-            // 
+            //
             this.txtMessage.Location = new System.Drawing.Point(12, 120);
             this.txtMessage.Multiline = true;
             this.txtMessage.Name = "txtMessage";
             this.txtMessage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtMessage.Size = new System.Drawing.Size(355, 93);
             this.txtMessage.TabIndex = 1;
-            // 
+            //
             // UI
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(379, 225);
