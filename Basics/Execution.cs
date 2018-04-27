@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,7 +15,8 @@ namespace AsyncWorkshop
             //btnMain.Click += BtnMainClick_WhatHappensToAsyncVoidDeepInside_SynchronousWork_TCS;
             //btnMain.Click += BtnMainClick_WhatHappensToAsyncVoidDeepInside_AsynchronousWork;
             //btnMain.Click += BtnMainClick_NotAwaitingTasks_WhichOnlyProduceResults;
-            //btnMain.Click += BtnMainClick_NotAwaitingTasks_WhichProduceSideEffects;
+            //btnMain.Click += BtnMainClick_CantRunAHotTaskSynchronously;
+            //btnMain.Click += BtnMainClick_WhatHappensToAsyncVoidDeepInside_WhenHittingTheAsynchonySource_YouReturnControlRightAfterTheAsyncVoidCall;
         }
 
         private void BtnMainClick_WhatHappensToAsyncVoidDeepInside_SynchronousWork_FakeAwait(object sender, EventArgs e)
@@ -134,6 +136,72 @@ namespace AsyncWorkshop
                     Thread.Sleep(1250);
                     MessageBox.Show("42");
                 });
+        }
+
+        private void BtnMainClick_CantRunAHotTaskSynchronously(object sender, EventArgs e)
+        {
+            TryToRunAHotTaskSynchronously_RunSynchronously();
+            btnMain.Text = "We've slept enough so that the task produced the result, and it manifested the side effects";
+        }
+
+        private void TryToRunAHotTaskSynchronously_RunSynchronously()
+        {
+            CantRunAHotTaskSynchronously().RunSynchronously();
+        }
+
+        private Task CantRunAHotTaskSynchronously()
+        {
+            var tcs = new TaskCompletionSource<object>();
+
+            ThreadPool.QueueUserWorkItem(
+                _ =>
+                {
+                    Thread.Sleep(2000);
+
+                    tcs.SetResult(null);
+                });
+
+            return tcs.Task;
+        }
+
+        private Task TaskRunSpitsOutHotTaskAlways()
+        {
+            Task task = null;
+
+            task = Task.Run(
+                () =>
+                {
+                    var t = task;
+                    Thread.Sleep(2000);
+
+                });
+            return task;
+        }
+
+        private void BtnMainClick_WhatHappensToAsyncVoidDeepInside_WhenHittingTheAsynchonySource_YouReturnControlRightAfterTheAsyncVoidCall(object sender, EventArgs e)
+        {
+            DoSomethingInAsyncVoid_AsynchronousInNature_WithContinuationOnThreadPool();
+            btnMain.Text = "2. This is executed after the asynchrony source is hit and its completion is registered";
+        }
+
+        private async void DoSomethingInAsyncVoid_AsynchronousInNature_WithContinuationOnThreadPool()
+        {
+            await SomethingThatReturnsATask_AsynchronousInNature_WithSomeBlockingInTheContinuationAsWell().ConfigureAwait(false);
+            btnMain.Invoke(new Action(() => btnMain.Text = "4. This is executed on a background thread"));
+        }
+
+        private async Task SomethingThatReturnsATask_AsynchronousInNature_WithSomeBlockingInTheContinuationAsWell()
+        {
+            btnMain.Text = "1. This is executed synchronously because it occurs before the asynchrony source"
+                           + " (Task.Delay, Task.Run, a TaskCompletionSource running on a new thread / TP thread, async I/O stuff from the framework)";
+            btnMain.Refresh();
+            Thread.Sleep(3000);
+
+            await Task.Delay(5000);
+
+            btnMain.Text = "3. You will see this as part of the continuation of the Task awaited in the call above";
+            btnMain.Refresh();
+            Thread.Sleep(1000);
         }
     }
 }
