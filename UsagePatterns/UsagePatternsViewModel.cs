@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
@@ -15,15 +14,14 @@ namespace AsyncWorkshop.UsagePatterns
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private RelayCommand _executeWhenAllCommand;
-        private RelayCommand _executePlayCommand;
+        private SequentialRelayCommandAsync _executeWhenAllCommand;
+        private readonly Subject<string> _play = new Subject<string>();
 
         private string _mediaSourcePath = @"D:\Projects - Extra\Workshop\workshop-async\media";
         private string _mediaDestinationPath = @"D:\Projects - Extra\Workshop\workshop-async\UsagePatterns\bin\Debug\copied";
-        private string _currentFileBeingPlayed;
 
         public ICommand ExecuteWhenAllCommand =>
-            _executeWhenAllCommand ?? (_executeWhenAllCommand = new RelayCommand(ExecuteWhenAll, () => !string.IsNullOrEmpty(_mediaSourcePath)));
+            _executeWhenAllCommand ?? (_executeWhenAllCommand = new SequentialRelayCommandAsync(ExecuteWhenAll, CanExecuteWhenAll));
 
         public string MediaSourcePath
         {
@@ -48,29 +46,14 @@ namespace AsyncWorkshop.UsagePatterns
             }
         }
 
-        public string CurrentFileBeingPlayed
-        {
-            get => _currentFileBeingPlayed;
-            set
-            {
-                _currentFileBeingPlayed = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private readonly Subject<string> _play = new Subject<string>();
         public IObservable<string> PlaySignals => _play.AsObservable();
 
-
-        private void ClearOutDestinationFolder()
+        private bool CanExecuteWhenAll()
         {
-            if (!string.IsNullOrEmpty(_mediaDestinationPath) && Directory.Exists(_mediaDestinationPath))
-            {
-                Directory.Delete(_mediaDestinationPath, true);
-            }
+            return !string.IsNullOrEmpty(_mediaSourcePath);
         }
 
-        private async void ExecuteWhenAll()
+        private async Task ExecuteWhenAll()
         {
             ClearOutDestinationFolder();
             Directory.CreateDirectory(_mediaDestinationPath);
@@ -79,8 +62,16 @@ namespace AsyncWorkshop.UsagePatterns
             var copyTasks = filePaths.Select(f => FileCopier.CopyFileAsync(f, _mediaDestinationPath)).ToArray();
             var copiedFilePaths = await Task.WhenAll(copyTasks);
 
-            _currentFileBeingPlayed = copiedFilePaths.First(name => name.EndsWith(".mp3"));
-            _play.OnNext(_currentFileBeingPlayed);
+            var currentFileBeingPlayed = copiedFilePaths.First(name => name.EndsWith(".mp3"));
+            _play.OnNext(currentFileBeingPlayed);
+        }
+
+        private void ClearOutDestinationFolder()
+        {
+            if (!string.IsNullOrEmpty(_mediaDestinationPath) && Directory.Exists(_mediaDestinationPath))
+            {
+                Directory.Delete(_mediaDestinationPath, true);
+            }
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

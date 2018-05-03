@@ -11,7 +11,11 @@ namespace AsyncWorkshop.UsagePatterns
 
             if (DataContext is IPlayableViewModel playableViewModel)
             {
-                playableViewModel.PlaySignals.Subscribe(path => player.Play(path));
+                playableViewModel.PlaySignals.Subscribe(path =>
+                {
+                    MessageBox.Show("playing: " + path);
+                    //player.Play(path);
+                });
             }
         }
     }

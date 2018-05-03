@@ -27,6 +27,16 @@
             </TabItem>
            <TabItem Header="WhenAll" IsSelected="True">
                <StackPanel Orientation="Horizontal">
+                   <StackPanel.Resources>
+                       <Style TargetType="{x:Type Button}">
+                           <Setter Property="IsEnabled" Value="True"/>
+                           <Style.Triggers>
+                               <Trigger Property="IsEnabled" Value="false">
+                                   <Setter Property="Foreground" Value="#FFADADAD"/>
+                               </Trigger>
+                           </Style.Triggers>
+                       </Style>
+                   </StackPanel.Resources>
                     <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}">Download all files</Button>
                </StackPanel>
            </TabItem>
