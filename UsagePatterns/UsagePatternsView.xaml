@@ -15,19 +15,19 @@
        <StackPanel Grid.Row="0">
             <Image Height="96" Width="96" />
             <WindowsFormsHost Height="50" Width="300">
-                <audio:Player />
+                <audio:Player x:Name="player" />
             </WindowsFormsHost>
        </StackPanel>
        <TabControl Grid.Row="1">
            <TabItem Header="Configuration">
                <StackPanel Orientation="Horizontal">
                     <Label Target="{Binding ElementName=txtMediaSource}" VerticalAlignment="Center">Media source folder</Label>
-                    <TextBox Height="25" Width="300" Name="txtMediaSource"/>
+                    <TextBox Height="25" Width="300" Name="txtMediaSource" Text="{Binding MediaSourcePath, UpdateSourceTrigger=PropertyChanged}"/>
                </StackPanel>
             </TabItem>
-           <TabItem Header="WhenAll">
+           <TabItem Header="WhenAll" IsSelected="True">
                <StackPanel Orientation="Horizontal">
-                    <Button Height="30" Margin="5" Padding="5" Command="">Download all files</Button>
+                    <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}">Download all files</Button>
                </StackPanel>
            </TabItem>
         </TabControl>

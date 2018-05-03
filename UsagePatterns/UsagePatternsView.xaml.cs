@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 
 namespace AsyncWorkshop.UsagePatterns
 {
@@ -7,6 +8,11 @@ namespace AsyncWorkshop.UsagePatterns
         public UsagePatternsView()
         {
             InitializeComponent();
+
+            if (DataContext is IPlayableViewModel playableViewModel)
+            {
+                playableViewModel.PlaySignals.Subscribe(path => player.Play(path));
+            }
         }
     }
 }
