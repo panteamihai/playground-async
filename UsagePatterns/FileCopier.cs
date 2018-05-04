@@ -6,31 +6,34 @@ namespace AsyncWorkshop.UsagePatterns
 {
     public static class FileCopier
     {
-        public static async Task<String> CopyFileAsync(string sourceFilePath,
+        public static async Task<string> CopyFileAsync(
+            string sourceFilePath,
             string destinationFolderPath,
-           // Label progDetails,
-           // ProgressBar progBar,
-            bool pauseOnCompleteToShowFullProgressBar = false)
+            IProgress<ValueTuple<string, int>> progress)
         {
-            if (pauseOnCompleteToShowFullProgressBar) await Task.Delay(1000);
-
             var fileName = Path.GetFileName(sourceFilePath);
             var copiedFileName = Path.Combine(destinationFolderPath, fileName);
             var tempFileName = copiedFileName + ".tmp";
 
-            //UpdateProgess(progBar, 0, progDetails, "");
-            using (var sourceStream = File.Open(sourceFilePath, FileMode.Open))
-            {
-                using (var destinationStream = File.Create(tempFileName))
-                {
-                    //UpdateProgess(progBar, 50, progDetails, "Copying " + Path.GetExtension(sourceFilePath));
-                    //UpdateConsole(Console, "Copying started : {0} ", Path.GetFileName(sourceFilePath));
+            var fileInfo = new FileInfo(sourceFilePath);
+            var fileLength = fileInfo.Length;
 
-                    await sourceStream.CopyToAsync(destinationStream, 4096);
+            var buffer = new byte[4096 * 16];
+
+            using (var sourceStream = File.OpenRead(sourceFilePath))
+            using (var destinationStream = File.Create(tempFileName))
+            {
+                int bytesRead;
+                int alreadyReadCount = 0;
+                while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    alreadyReadCount += bytesRead;
+                    await destinationStream.WriteAsync(buffer, 0, buffer.Length);
+
+                    var progressPercentage = (int)((decimal)alreadyReadCount / fileLength * 100);
+                    progress.Report((fileName, progressPercentage));
                 }
             }
-            //UpdateProgess(progBar, 100, progDetails, "Copy " + Path.GetExtension(sourceFilePath) + " complete.");
-            //UpdateConsole(Console, "Copy completed : {0} ", Path.GetFileName(sourceFilePath));
 
             File.Move(tempFileName, copiedFileName);
 

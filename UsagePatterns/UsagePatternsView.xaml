@@ -6,40 +6,72 @@
         xmlns:audio="clr-namespace:AudioPlayer;assembly=AudioPlayer"
         mc:Ignorable="d"
         DataContext="{StaticResource UsagePatternsViewModel}"
-        Title="{Binding Title}" Height="350" Width="525">
-   <Grid>
-       <Grid.RowDefinitions>
+        Height="538" Width="614">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-       <StackPanel Grid.Row="0">
+        <StackPanel Orientation="Horizontal">
             <Image Height="96" Width="96" />
             <WindowsFormsHost Height="50" Width="300">
                 <audio:Player x:Name="player" />
             </WindowsFormsHost>
-       </StackPanel>
-       <TabControl Grid.Row="1">
-           <TabItem Header="Configuration">
-               <StackPanel Orientation="Horizontal">
-                    <Label Target="{Binding ElementName=txtMediaSource}" VerticalAlignment="Center">Media source folder</Label>
-                    <TextBox Height="25" Width="300" Name="txtMediaSource" Text="{Binding MediaSourcePath, UpdateSourceTrigger=PropertyChanged}"/>
-               </StackPanel>
+        </StackPanel>
+        <TabControl Grid.Row="1">
+            <TabItem Header="Configuration">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Target="{Binding ElementName=MediaSource}"
+                               VerticalAlignment="Center"
+                               Grid.Column="0">Media source folder</Label>
+                        <TextBox Name="MediaSource"
+                                 Grid.Column="1"
+                                 VerticalContentAlignment="Center"
+                                  Text="{Binding MediaSourcePath, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="150"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Target="{Binding ElementName=MediaDestination}"
+                               VerticalAlignment="Center"
+                               Grid.Column="0">Media destination folder</Label>
+                        <TextBox Name="MediaDestination"
+                                 Grid.Column="1"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding MediaDestinationPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                        </TextBox>
+                    </Grid>
+                </StackPanel>
             </TabItem>
-           <TabItem Header="WhenAll" IsSelected="True">
-               <StackPanel Orientation="Horizontal">
-                   <StackPanel.Resources>
-                       <Style TargetType="{x:Type Button}">
-                           <Setter Property="IsEnabled" Value="True"/>
-                           <Style.Triggers>
-                               <Trigger Property="IsEnabled" Value="false">
-                                   <Setter Property="Foreground" Value="#FFADADAD"/>
-                               </Trigger>
-                           </Style.Triggers>
-                       </Style>
-                   </StackPanel.Resources>
+            <TabItem Header="WhenAll" IsSelected="True">
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="IsEnabled" Value="True"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="false">
+                                    <Setter Property="Foreground" Value="#FFADADAD"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Resources>
                     <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}">Download all files</Button>
-               </StackPanel>
-           </TabItem>
+                    <ProgressBar
+                        x:Name="ProgressBar"
+                        Height="30" Width="380"
+                        Value="{Binding WhenAllProgress, Mode=OneWay}"/>
+                </StackPanel>
+            </TabItem>
         </TabControl>
-   </Grid>
+        <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding ProgressReporting}">
+        </ListView>
+    </Grid>
 </Window>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 
 namespace AsyncWorkshop.UsagePatterns
@@ -13,7 +14,6 @@ namespace AsyncWorkshop.UsagePatterns
             {
                 playableViewModel.PlaySignals.Subscribe(path =>
                 {
-                    MessageBox.Show("playing: " + path);
                     //player.Play(path);
                 });
             }
