@@ -16,19 +16,17 @@ namespace AsyncWorkshop.UsagePatterns
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private readonly object _locker = new object();
-
         private SequentialRelayCommandAsync _executeWhenAllCommand;
 
         private readonly Subject<string> _play = new Subject<string>();
-        private readonly Subject<int> _progressPercent = new Subject<int>();
+        private readonly Subject<decimal> _progressPercent = new Subject<decimal>();
+        private readonly ConcurrentDictionary<string, ValueTuple<decimal, bool>> _cumulatedProgressByFileName = new ConcurrentDictionary<string, ValueTuple<decimal, bool>>();
 
         private string _mediaSourcePath = @"D:\Projects - Extra\Workshop\workshop-async\media";
-        private readonly string _mediaDestinationPath;
-
         private int _whenAllProgress;
-        private int _cummulatedWhenAllProgress;
-        private ConcurrentBag<IProgress<ValueTuple<string, int>>> _whenAllProgresses;
+        private decimal _cummulatedWhenAllProgress;
+
+        private ConcurrentBag<IProgress<ValueTuple<string, decimal, bool>>> _whenAllProgresses;
 
         public ICommand ExecuteWhenAllCommand =>
             _executeWhenAllCommand ?? (_executeWhenAllCommand = new SequentialRelayCommandAsync(ExecuteWhenAll, CanExecuteWhenAll));
@@ -43,7 +41,7 @@ namespace AsyncWorkshop.UsagePatterns
             }
         }
 
-        public string MediaDestinationPath => _mediaDestinationPath;
+        public string MediaDestinationPath { get; }
 
         public int WhenAllProgress
         {
@@ -61,11 +59,11 @@ namespace AsyncWorkshop.UsagePatterns
 
         public UsagePatternsViewModel()
         {
-            _progressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAllProgress = p);
+            _progressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAllProgress = (int)p);
 
-            _mediaDestinationPath = Path.Combine(Path.GetTempPath(), "CopiedMediaForAsyncWorkshop");
-            if (!Directory.Exists(_mediaDestinationPath))
-                Directory.CreateDirectory(_mediaDestinationPath);
+            MediaDestinationPath = Path.Combine(Path.GetTempPath(), "CopiedMediaForAsyncWorkshop");
+            if (!Directory.Exists(MediaDestinationPath))
+                Directory.CreateDirectory(MediaDestinationPath);
             else
                 ClearOutDestinationFolder();
         }
@@ -78,16 +76,16 @@ namespace AsyncWorkshop.UsagePatterns
         private async Task ExecuteWhenAll()
         {
             ClearOutDestinationFolder();
-            Directory.CreateDirectory(_mediaDestinationPath);
+            Directory.CreateDirectory(MediaDestinationPath);
 
             var filePaths = FileRetriever.GetFilePathsRecursively(_mediaSourcePath);
-            _whenAllProgresses = new ConcurrentBag<IProgress<ValueTuple<string, int>>>();
+            _whenAllProgresses = new ConcurrentBag<IProgress<ValueTuple<string, decimal, bool>>>();
 
             var copyTasks = filePaths.Select(f =>
             {
-                var progress = new Progress<ValueTuple<string, int>>(ReportProgress);
+                var progress = new Progress<ValueTuple<string, decimal, bool>>(ReportProgress);
                 _whenAllProgresses.Add(progress);
-                return FileCopier.CopyFileAsync(f, _mediaDestinationPath, progress);
+                return FileCopier.CopyFileAsync(f, MediaDestinationPath, progress);
             }).ToArray();
             var copiedFilePaths = await Task.WhenAll(copyTasks);
 
@@ -98,23 +96,42 @@ namespace AsyncWorkshop.UsagePatterns
             _play.OnNext(currentFileBeingPlayed);
         }
 
-        private void ReportProgress((string FileName, int FilePercentageComplete) progress)
+        private void ReportProgress((string FileName, decimal FilePercentageCompleteIncrement, bool Finished) progress)
         {
-            _cummulatedWhenAllProgress += progress.FilePercentageComplete;
-            _progressPercent.OnNext(_cummulatedWhenAllProgress / _whenAllProgresses.Count);
+            _cumulatedProgressByFileName.AddOrUpdate(
+                progress.FileName,
+                (progress.FilePercentageCompleteIncrement, false),
+                (key, existing) => (existing.Item1 + progress.FilePercentageCompleteIncrement, progress.Finished));
 
-            ProgressReporting.Add(
-                (progress.FilePercentageComplete == 100
+            _cummulatedWhenAllProgress += progress.FilePercentageCompleteIncrement;
+
+            var allFinished = _cumulatedProgressByFileName.All(p => p.Value.Item2);
+            _progressPercent.OnNext(allFinished ? 100 : _cummulatedWhenAllProgress / _whenAllProgresses.Count);
+
+            var progressOnFileName = _cumulatedProgressByFileName[progress.FileName];
+            var newProgressInfoForFile =
+                (progress.Finished
                     ? "Finished downloading: "
-                    : $"Downloading ({progress.FilePercentageComplete} %): ")
-                + progress.FileName);
+                    : $"Downloading ({progressOnFileName.Item1:N1} %): ") + progress.FileName;
+
+            var existingProgressInfoForFile = ProgressReporting.FirstOrDefault(f => f.Contains(progress.FileName));
+            if (existingProgressInfoForFile != null)
+            {
+                var indexOfEntry = ProgressReporting.IndexOf(existingProgressInfoForFile);
+                ProgressReporting.RemoveAt(indexOfEntry);
+                ProgressReporting.Insert(indexOfEntry, newProgressInfoForFile);
+            }
+            else
+            {
+                ProgressReporting.Add(newProgressInfoForFile);
+            }
         }
 
         private void ClearOutDestinationFolder()
         {
-            if (!string.IsNullOrEmpty(_mediaDestinationPath) && Directory.Exists(_mediaDestinationPath))
+            if (!string.IsNullOrEmpty(MediaDestinationPath) && Directory.Exists(MediaDestinationPath))
             {
-                foreach (var file in Directory.GetFiles(_mediaDestinationPath))
+                foreach (var file in Directory.GetFiles(MediaDestinationPath))
                 {
                     File.Delete(file);
                 }

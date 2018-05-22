@@ -9,7 +9,7 @@ namespace AsyncWorkshop.UsagePatterns
         public static async Task<string> CopyFileAsync(
             string sourceFilePath,
             string destinationFolderPath,
-            IProgress<ValueTuple<string, int>> progress)
+            IProgress<ValueTuple<string, decimal, bool>> progress)
         {
             var fileName = Path.GetFileName(sourceFilePath);
             var copiedFileName = Path.Combine(destinationFolderPath, fileName);
@@ -24,14 +24,19 @@ namespace AsyncWorkshop.UsagePatterns
             using (var destinationStream = File.Create(tempFileName))
             {
                 int bytesRead;
-                int alreadyReadCount = 0;
+                var alreadyReadCount = 0;
+                var cummulatedProgressPercentage = 0m;
                 while ((bytesRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
                     alreadyReadCount += bytesRead;
-                    await destinationStream.WriteAsync(buffer, 0, buffer.Length);
+                    var progressPercentageIncrement = (decimal)bytesRead / fileLength * 100;
+                    cummulatedProgressPercentage += progressPercentageIncrement;
 
-                    var progressPercentage = (int)((decimal)alreadyReadCount / fileLength * 100);
-                    progress.Report((fileName, progressPercentage));
+                    progress.Report(alreadyReadCount == fileLength
+                                            ? (fileName, 100 - cummulatedProgressPercentage, true)
+                                            : (fileName, progressPercentageIncrement, false));
+
+                    await destinationStream.WriteAsync(buffer, 0, buffer.Length);
                 }
             }
 
