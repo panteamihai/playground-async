@@ -72,8 +72,13 @@
     <Compile Include="FileCopier.cs" />
     <Compile Include="FileRetriever.cs" />
     <Compile Include="IPlayableViewModel.cs" />
-    <Compile Include="SequentialRelayCommandAsync.cs" />
+    <Compile Include="Commands\SequentialBoundRelayCommand.cs" />
+    <Compile Include="Commands\SequentialRelayCommandAsync.cs" />
     <Compile Include="UsagePatternsViewModel.cs" />
+    <Page Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UsagePatternsView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

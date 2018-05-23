@@ -3,7 +3,7 @@ using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace AsyncWorkshop.UsagePatterns
+namespace AsyncWorkshop.UsagePatterns.Commands
 {
     public class SequentialRelayCommandAsync : ICommand
     {
@@ -11,11 +11,6 @@ namespace AsyncWorkshop.UsagePatterns
         private readonly Func<bool> _targetCanExecuteMethod;
 
         private bool _currentlyExecuting;
-
-        public SequentialRelayCommandAsync(Func<Task> executeMethod)
-        {
-            _targetExecuteMethod = executeMethod;
-        }
 
         public SequentialRelayCommandAsync(Func<Task> executeMethod, Func<bool> canExecuteMethod)
         {

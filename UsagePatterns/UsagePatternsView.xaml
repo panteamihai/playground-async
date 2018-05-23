@@ -7,6 +7,13 @@
         mc:Ignorable="d"
         DataContext="{StaticResource UsagePatternsViewModel}"
         Height="538" Width="614">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -63,15 +70,17 @@
                             </Style.Triggers>
                         </Style>
                     </StackPanel.Resources>
-                    <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}">Download all files</Button>
+                    <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}" Style="{StaticResource DisappearableButton}">Download all files</Button>
+                    <Button Height="30" Margin="5" Padding="5" Command="{Binding CancelWhenAllCommand}" Style="{StaticResource DisappearableButton}">Cancel download</Button>
                     <ProgressBar
                         x:Name="ProgressBar"
                         Height="30" Width="380"
-                        Value="{Binding WhenAllProgress, Mode=OneWay}"/>
+                        Value="{Binding WhenAllProgressPercentage, Mode=OneWay}"/>
                 </StackPanel>
             </TabItem>
         </TabControl>
-        <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding ProgressReporting}">
+        <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding FileProgressInformation}">
         </ListView>
     </Grid>
 </Window>
+ 

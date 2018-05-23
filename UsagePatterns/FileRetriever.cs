@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AsyncWorkshop.UsagePatterns
 {
@@ -8,7 +9,7 @@ namespace AsyncWorkshop.UsagePatterns
         public static List<string> GetFilePathsRecursively(string folderPath)
         {
             var fileNames = new List<string>();
-            foreach (var folder in Directory.EnumerateDirectories(folderPath))
+            foreach (var folder in Directory.EnumerateDirectories(folderPath).Union(new[] {folderPath}))
             {
                 foreach (var file in Directory.EnumerateFiles(folder))
                 {
