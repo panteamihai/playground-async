@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace AsyncWorkshop
+namespace AsyncWorkshop.Basics
 {
     static class Program
     {

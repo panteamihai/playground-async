@@ -1,4 +1,4 @@
-﻿namespace AsyncWorkshop
+﻿namespace AsyncWorkshop.Basics
 {
     partial class Execution
     {

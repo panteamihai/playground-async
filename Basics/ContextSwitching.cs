@@ -3,7 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AsyncWorkshop
+namespace AsyncWorkshop.Basics
 {
     public partial class ContextSwitching : Form
     {
