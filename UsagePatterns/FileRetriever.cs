@@ -8,18 +8,26 @@ namespace AsyncWorkshop.UsagePatterns
     {
         public static List<string> GetFilePathsRecursively(string folderPath)
         {
-            var fileNames = new List<string>();
+            var filePaths = new List<string>();
             foreach (var folder in Directory.EnumerateDirectories(folderPath).Union(new[] {folderPath}))
             {
                 foreach (var file in Directory.EnumerateFiles(folder))
                 {
                     var extension = Path.GetExtension(file);
                     if (extension != ".png" ||
-                        extension == ".png" && !fileNames.Exists(f => f.EndsWith(".png")))
-                        fileNames.Add(file);
+                        extension == ".png" && !filePaths.Exists(f => f.EndsWith(".png")))
+                        filePaths.Add(file);
                 }
             }
-            return fileNames;
+            return filePaths;
+        }
+
+        public static List<string> GetSortedFilePathsRecursively(string folderPath)
+        {
+            var filePaths = GetFilePathsRecursively(folderPath);
+            filePaths.Sort();
+
+            return filePaths;
         }
     }
 }

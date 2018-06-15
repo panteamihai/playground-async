@@ -26,7 +26,7 @@
                 <audio:Player x:Name="player" />
             </WindowsFormsHost>
         </StackPanel>
-        <TabControl Grid.Row="1">
+        <TabControl Grid.Row="1" Margin="0,0,0,154" Grid.RowSpan="2">
             <TabItem Header="Configuration">
                 <StackPanel>
                     <Grid>
@@ -58,29 +58,42 @@
                     </Grid>
                 </StackPanel>
             </TabItem>
-            <TabItem Header="WhenAll" IsSelected="True">
+            <TabItem Header="WhenAll">
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel.Resources>
-                        <Style TargetType="{x:Type Button}">
-                            <Setter Property="IsEnabled" Value="True"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsEnabled" Value="false">
-                                    <Setter Property="Foreground" Value="#FFADADAD"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Resources>
                     <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAllCommand}" Style="{StaticResource DisappearableButton}">Download all files</Button>
                     <Button Height="30" Margin="5" Padding="5" Command="{Binding CancelWhenAllCommand}" Style="{StaticResource DisappearableButton}">Cancel download</Button>
                     <ProgressBar
-                        x:Name="ProgressBar"
+                        x:Name="ProgressBarWhenAll"
                         Height="30" Width="380"
                         Value="{Binding WhenAllProgressPercentage, Mode=OneWay}"/>
                 </StackPanel>
             </TabItem>
+            <TabItem Header="WhenAny - Throttled" IsSelected="True">
+                <StackPanel Orientation="Horizontal">
+                    <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAnyThrottledCommand}" Style="{StaticResource DisappearableButton}" Content="Download in batches"/>
+                    <Button Height="30" Margin="5" Padding="5" Command="{Binding CancelWhenAnyThrottledCommand}" Style="{StaticResource DisappearableButton}" Content="Cancel download"/>
+                    <StackPanel>
+                        <ProgressBar
+                            x:Name="ProgressBarWhenAnyThrottled_1"
+                            Height="30" Width="346"
+                            Value="{Binding WhenAnyThrottled1ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                        <ProgressBar
+                            x:Name="ProgressBarWhenAnyThrottled_2"
+                            Height="30" Width="346"
+                            Value="{Binding WhenAnyThrottled2ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                        <ProgressBar
+                            x:Name="ProgressBarWhenAnyThrottled_3"
+                            Height="30" Width="346"
+                            Value="{Binding WhenAnyThrottled3ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                        <ProgressBar
+                            x:Name="ProgressBarWhenAnyThrottled_4"
+                            Height="30" Width="346"
+                            Value="{Binding WhenAnyThrottled4ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                    </StackPanel>
+                </StackPanel>
+            </TabItem>
         </TabControl>
-        <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding FileProgressInformation}">
+        <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding FileProgressInformation}" Margin="0,20,0,0">
         </ListView>
     </Grid>
 </Window>
- 
