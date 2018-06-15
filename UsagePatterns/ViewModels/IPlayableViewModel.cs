@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AsyncWorkshop.UsagePatterns
+namespace AsyncWorkshop.UsagePatterns.ViewModels
 {
     public interface IPlayableViewModel
     {

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Windows;
 
-namespace AsyncWorkshop.UsagePatterns
+using AsyncWorkshop.UsagePatterns.ViewModels;
+
+namespace AsyncWorkshop.UsagePatterns.Views
 {
     public partial class UsagePatternsView : Window
     {

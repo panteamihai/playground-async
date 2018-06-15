@@ -1,10 +1,12 @@
 ﻿<Application x:Class="AsyncWorkshop.UsagePatterns.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:AsyncWorkshop.UsagePatterns"
              xmlns:viewModels="clr-namespace:AsyncWorkshop.UsagePatterns.ViewModels"
-             StartupUri="UsagePatternsView.xaml">
+             StartupUri="Views\UsagePatternsView.xaml">
     <Application.Resources>
-        <local:UsagePatternsViewModel x:Key="UsagePatternsViewModel" />
+        <viewModels:UsagePatternsViewModel x:Key="UsagePatternsViewModel" />
+        <viewModels:ConfigurationViewModel x:Key="ConfigurationViewModel" />
+        <viewModels:WhenAllViewModel x:Key="WhenAllViewModel" />
+        <viewModels:WhenAnyThrottledViewModel x:Key="WhenAnyThrottledViewModel" />
     </Application.Resources>
 </Application>

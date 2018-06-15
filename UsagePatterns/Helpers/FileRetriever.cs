@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 
-namespace AsyncWorkshop.UsagePatterns
+namespace AsyncWorkshop.UsagePatterns.Helpers
 {
     public static class FileRetriever
     {
@@ -28,6 +28,17 @@ namespace AsyncWorkshop.UsagePatterns
             filePaths.Sort();
 
             return filePaths;
+        }
+
+        public static IEnumerable<string> GetFilePathsByPattern(string path, string searchPattern, SearchOption searchOption)
+        {
+            var searchPatterns = searchPattern.Split('|');
+            var files = new List<string>();
+            foreach (var sp in searchPatterns)
+            foreach (var file in Directory.GetFiles(path, sp, searchOption))
+            {
+                yield return file;
+            }
         }
     }
 }

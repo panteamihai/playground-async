@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using IFileCopyProgress = System.IProgress<(System.IO.FileInfo fileInfo, decimal percentage, bool hasFinished)>;
 
-namespace AsyncWorkshop.UsagePatterns
+namespace AsyncWorkshop.UsagePatterns.Helpers
 {
     public static class FileCopier
     {
