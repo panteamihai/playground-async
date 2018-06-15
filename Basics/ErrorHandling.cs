@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -20,6 +20,8 @@ namespace AsyncWorkshop.Basics
             //btnMain.Click += BtnMainClick_TwoLevelsOfNestedAsyncAwaitCalls_IsStillAnUnhandledException;
             //btnMain.Click += BtnMainClick_SynchronouslyWaitingForFaultedTaskIsStupidBut_NoExceptionLeak;
             //btnMain.Click += BtnMainClick_Responsive_ButWillThrow_CrossThreadOnlyInDebugMode;
+            //btnMain.Click += BtnMainClick_NullWillNotBeWrappedInATask_InTaskReturningMethodsNotMarkedWithAsync;
+            //btnMain.Click += BtnMainClick_NullWillBeWrappedInATask_InTaskReturningMethodsMarkedWithAsync;
         }
 
         private async void BtnMainClick_CannotAwaitAsyncVoid(object sender, EventArgs e)
@@ -27,7 +29,7 @@ namespace AsyncWorkshop.Basics
             //Uncomment this, but it won't compile
             //await ThrowExceptionAsync();
 
-            btnMain.Text = "Will end up here after Unhadled Exception is thrown!";
+            btnMain.Text = "Will end up here after Unhandled Exception is thrown!";
         }
 
         private void BtnMainClick_CannotCatchExceptionsFromAsyncVoid_ResultingInUnhandledException_WithSynchronousThrowing(object sender, EventArgs e)
@@ -41,7 +43,7 @@ namespace AsyncWorkshop.Basics
                 // The exception is never caught here!
             }
 
-            btnMain.Text = "Will end up here after Unhadled Exception is thrown!";
+            btnMain.Text = "Will end up here after Unhandled Exception is thrown!";
         }
 
         private async void ThrowSynchronousExceptionInAsyncVoid()
@@ -60,7 +62,7 @@ namespace AsyncWorkshop.Basics
                 // The exception is never caught here!
             }
 
-            btnMain.Text = "Will end up here after Unhadled Exception is thrown!";
+            btnMain.Text = "Will end up here after Unhandled Exception is thrown!";
         }
 
         private async void ThrowAsynchronousExceptionInAsyncVoid()
@@ -167,7 +169,7 @@ namespace AsyncWorkshop.Basics
         {
             try
             {
-                SyncronouslyWaintingTaskThatWillBeFaulted();
+                SynchronouslyWaitingTaskThatWillBeFaulted();
             }
             catch (Exception)
             {
@@ -177,7 +179,7 @@ namespace AsyncWorkshop.Basics
             btnMain.Text = "We are OK";
         }
 
-        private void SyncronouslyWaintingTaskThatWillBeFaulted()
+        private void SynchronouslyWaitingTaskThatWillBeFaulted()
         {
             Task.Run(() => throw new InvalidOperationException()).Wait();
         }
@@ -199,7 +201,64 @@ namespace AsyncWorkshop.Basics
                     }
                 });
 
-            btnMain.Text = "Hi, well this was awkward";
+            btnMain.Text = "Hi, well this was awkward!";
+        }
+
+        private async void BtnMainClick_NullWillNotBeWrappedInATask_InTaskReturningMethodsNotMarkedWithAsync(object sender, EventArgs e)
+        {
+            //The logic here is that the source of asynchrony is somewhere deep in the call hierarchy.
+            //So, in order to optimize the flow, you don't async/await all the way up, which will basically
+            //just create useless FSMs (finite state machine), until you reach the last level where the
+            //asynchrony source's result is actually used, you just return the task instead of awaiting it
+            //in intermediary processing calls. You end up with 2 awaits (at the source and at the top where
+            //the result is used) and returns in between
+
+            await IntermediaryTaskProcessingStep_ReturningNull(sender); //This will take down the program
+
+            btnMain.Text = "Never gonna give you up, but you won't get here!";
+        }
+
+        private Task<int?> IntermediaryTaskProcessingStep_ReturningNull(object sender)
+        {
+            if (sender is Button button)
+                return null; //This is the stupid part. Since you don't async/await in this intermediary step,
+                             //there is no automating wrapping of this null in a Task, which means up above
+                             //at the top you're awaiting on a Task that is null => NRE (when you should be
+                             //awaiting a Task with a Result of null)
+
+            return CreateTaskAsync();
+        }
+
+        private async Task<int?> CreateTaskAsync()
+        {
+            await Task.Delay(3000);
+
+            return 6;
+        }
+
+        private async void BtnMainClick_NullWillBeWrappedInATask_InTaskReturningMethodsMarkedWithAsync(object sender, EventArgs e)
+        {
+            //The logic here is that the source of asynchrony is somewhere deep in the call hierarchy.
+            //So, in order to optimize the flow, you don't async/await all the way up, which will basically
+            //just create useless FSMs (finite state machine), until you reach the last level where the
+            //asynchrony source's result is actually used, you just return the task instead of awaiting it
+            //in intermediary processing calls. You end up with 2 awaits (at the source and at the top where
+            //the result is used) and returns in between
+
+            var result = await IntermediaryTaskProcessingStep_ReturningTaskOfNull(sender); //This will take down the program
+
+            btnMain.Text = $@"Result was: {(result == null ? "null" : result.ToString())}";
+        }
+
+        private Task<int?> IntermediaryTaskProcessingStep_ReturningTaskOfNull(object sender)
+        {
+            if (sender is Button button)
+                return Task.FromResult<int?>(null); //This is the stupid part. Since you don't async/await in this intermediary step,
+            //there is no automating wrapping of this null in a Task, which means up above
+            //at the top you're awaiting on a Task that is null => NRE (when you should be
+            //awaiting a Task with a Result of null)
+
+            return CreateTaskAsync();
         }
     }
 }
