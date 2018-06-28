@@ -1,4 +1,7 @@
-﻿using System;
+﻿using AsyncWorkshop.UsagePatterns.Commands;
+using AsyncWorkshop.UsagePatterns.Helpers;
+using AsyncWorkshop.UsagePatterns.Services;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -6,14 +9,9 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-
-using AsyncWorkshop.UsagePatterns.Commands;
-using AsyncWorkshop.UsagePatterns.Helpers;
-using AsyncWorkshop.UsagePatterns.Services;
 
 using CumulatedProgressByFile = System.Collections.Concurrent.ConcurrentDictionary<System.IO.FileInfo, (decimal percentage, bool hasFinished)>;
 using FileCopyProgress = System.Progress<(System.IO.FileInfo fileInfo, decimal percentage, bool hasFinished)>;
@@ -202,7 +200,7 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
 
         private void UpdateWhenAnyThrottledProgress(FileInfo fileInfo, decimal value)
         {
-            var reportingFile = _currentlyReportingFiles.Single(t => t.filePath == fileInfo.FullName);
+            var reportingFile = _currentlyReportingFiles.OrderByDescending(t => t.percent).First(t => t.filePath == fileInfo.FullName);
             var index = reportingFile.index;
 
             switch (index + 1)

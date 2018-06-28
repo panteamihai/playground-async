@@ -2,16 +2,12 @@
 using AsyncWorkshop.UsagePatterns.Services;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
 
 namespace AsyncWorkshop.UsagePatterns.ViewModels
 {
-    public class UsagePatternsViewModel : INotifyPropertyChanged, IPlayableViewModel
+    public class UsagePatternsViewModel : IPlayableViewModel
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public WhenAllViewModel WhenAllViewModel { get; }
         public WhenAnyThrottledViewModel WhenAnyThrottledViewModel { get; }
@@ -57,11 +53,6 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
                     FileProgressInformation.Add(notification.Message);
                     break;
             }
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

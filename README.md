@@ -15,7 +15,9 @@
 
 ### Note
 
-[Clearing the Windows file cache] is an issue for testing the following functionalities.
+The following functionalities, captured in the [UsagePatterns project] are all taken and extended from [Liam Westley]'s brilliant NDC London 2014 talk [Async C# 5.0 - Patterns For Real World Use] so props to him for a great presentation and source material, check out his [original implementation]. The [demo album] of the featured band, Silents, must be downloaded in all formats (m4a, flac, mp3, ogg) and placed in the root repo folder inside a folder called media, or the path to the location of the download needs to be adjusted in the [MediaService implementation].
+
+Also note that [clearing the Windows file cache] is essential for running this project under Windows multiple times (for now at least).
 
 ## Progress reporting
 
@@ -32,6 +34,19 @@ Stephen Cleary - [Reporting Progress from Async Tasks]
 * Witness the proper cancellation etiquette that involves throwing an `OperationCanceledException`.
 * Catching said exception type for handling the cleanup phase at a task level and also at the central point of aggregation (the common reporting action).
 
+### Move the whole structure of the program to user controls and view models.
+
+## Throttling
+* Use a [fixed size buffer] for running a set number of tasks at a time.
+* Show the progress by assigning each running task one specific bar to constantly update with new info.
+
 [Reporting Progress from Async Tasks]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
 [incremental]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
-[Clearing the Windows file cache]: <https://stackoverflow.com/questions/478340/clear-file-cache-to-repeat-performance-testing>
+[clearing the Windows file cache]: <https://stackoverflow.com/questions/478340/clear-file-cache-to-repeat-performance-testing>
+[UsagePatterns project]: <https://github.com/panteamihai/workshop-async/tree/master/UsagePatterns>
+[Liam Westley]: <https://twitter.com/westleyl>
+[Async C# 5.0 - Patterns For Real World Use]: <https://vimeo.com/97337304>
+[original implementation]: <https://github.com/westleyl/NDCOslo-AsyncPatterns>
+[demo album]: <https://silents.bandcamp.com/>
+[MediaService implementation]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/Services/MediaPathService.cs#L10>
+[fixed size buffer]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyThrottledViewModel.cs#L148>
