@@ -69,8 +69,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers\Notification.cs" />
-    <Compile Include="Services\IMediaPathService.cs" />
-    <Compile Include="Services\MediaPathService.cs" />
+    <Compile Include="Services\IPathService.cs" />
+    <Compile Include="Services\PathService.cs" />
+    <Compile Include="ViewModels\OperationViewModel.cs" />
     <Compile Include="ViewModels\WhenAllViewModel.cs" />
     <Compile Include="ViewModels\WhenAnyThrottledViewModel.cs" />
     <Compile Include="Views\ConfigurationView.xaml.cs">

@@ -12,26 +12,45 @@
                 <ColumnDefinition Width="150"></ColumnDefinition>
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
             <Label Target="{Binding ElementName=MediaSource}"
-                       VerticalAlignment="Center"
-                       Grid.Column="0">Media source folder</Label>
+                   Grid.Row="0"
+                   Grid.Column="0"
+                   VerticalAlignment="Center">
+                Media source folder
+            </Label>
             <TextBox Name="MediaSource"
-                         Grid.Column="1"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding MediaSourcePath, UpdateSourceTrigger=PropertyChanged}"/>
-        </Grid>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"></ColumnDefinition>
-                <ColumnDefinition Width="*"></ColumnDefinition>
-            </Grid.ColumnDefinitions>
+                     Grid.Row="0"
+                     Grid.Column="1"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding MediaSourcePath, UpdateSourceTrigger=PropertyChanged}"/>
             <Label Target="{Binding ElementName=MediaDestination}"
-                       VerticalAlignment="Center"
-                       Grid.Column="0">Media destination folder</Label>
+                   Grid.Row="1"
+                   Grid.Column="0"
+                   VerticalAlignment="Center">
+                Media destination folder
+            </Label>
             <TextBox Name="MediaDestination"
-                         Grid.Column="1"
-                         VerticalContentAlignment="Center"
-                         Text="{Binding MediaDestinationPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+                     Grid.Row="1"
+                     Grid.Column="1"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding MediaDestinationPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
+            </TextBox>
+            <Label Target="{Binding ElementName=Utility}"
+                   Grid.Row="2"
+                   Grid.Column="0"
+                   VerticalAlignment="Center">
+                Utility folder
+            </Label>
+            <TextBox Name="Utility"
+                     Grid.Row="2"
+                     Grid.Column="1"
+                     VerticalContentAlignment="Center"
+                     Text="{Binding UtilityPath, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}">
             </TextBox>
         </Grid>
     </StackPanel>

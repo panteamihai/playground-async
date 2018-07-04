@@ -1,245 +1,201 @@
-﻿using AsyncWorkshop.UsagePatterns.Commands;
-using AsyncWorkshop.UsagePatterns.Helpers;
+﻿using AsyncWorkshop.UsagePatterns.Helpers;
 using AsyncWorkshop.UsagePatterns.Services;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
-using CumulatedProgressByFile = System.Collections.Concurrent.ConcurrentDictionary<System.IO.FileInfo, (decimal percentage, bool hasFinished)>;
-using FileCopyProgress = System.Progress<(System.IO.FileInfo fileInfo, decimal percentage, bool hasFinished)>;
+using CurrentlyReportingFiles = System.Collections.Concurrent.ConcurrentDictionary<string, (int index, bool hasFinished, decimal percent)>;
 
 namespace AsyncWorkshop.UsagePatterns.ViewModels
 {
-    public class WhenAnyThrottledViewModel : INotifyPropertyChanged
+    public class WhenAnyThrottledViewModel : OperationViewModel, INotifyPropertyChanged
     {
-        private readonly IMediaPathService _mediaPathService;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private readonly CumulatedProgressByFile _cumulatedProgressByFile = new CumulatedProgressByFile();
-
         private const int BatchLevel = 4;
 
-        private SequentialRelayCommandAsync _executeWhenAnyThrottledCommand;
-        private SequentialBoundRelayCommand _cancelWhenAnyThrottledCommand;
+        private int _firstProgressPercentage;
+        private int _secondProgressPercentage;
+        private int _thirdProgressPercentage;
+        private int _fourthProgressPercentage;
 
-        private readonly Subject<string> _play = new Subject<string>();
-        private readonly Subject<Notifcation> _info = new Subject<Notifcation>();
+        private string _firstBlock;
+        private string _secondBlock;
+        private string _thirdBlock;
+        private string _fourthBlock;
 
-        private readonly Subject<decimal> _1ProgressPercent = new Subject<decimal>();
-        private readonly Subject<decimal> _2ProgressPercent = new Subject<decimal>();
-        private readonly Subject<decimal> _3ProgressPercent = new Subject<decimal>();
-        private readonly Subject<decimal> _4ProgressPercent = new Subject<decimal>();
+        private readonly CurrentlyReportingFiles _currentlyReportingFiles = new CurrentlyReportingFiles();
 
-        private readonly CancellationTokenSource _whenAnyThrottledCancellationTokenSource = new CancellationTokenSource();
-
-        private readonly List<(string filePath, int index, bool finished, decimal percent)> _currentlyReportingFiles = new List<(string filePath, int index, bool finished, decimal percent)>();
-
-        public ICommand ExecuteWhenAnyThrottledCommand =>
-            _executeWhenAnyThrottledCommand ?? (_executeWhenAnyThrottledCommand = new SequentialRelayCommandAsync(ExecuteWhenAnyThrottled, CanExecuteWhenAnyThrottled));
-        public ICommand CancelWhenAnyThrottledCommand =>
-            _cancelWhenAnyThrottledCommand ?? (_cancelWhenAnyThrottledCommand = new SequentialBoundRelayCommand(ExecuteWhenAnyThrottledCommand, CancelWhenAnyThrottled));
-
-        public IObservable<Notifcation> Info => _info.AsObservable();
-        public IObservable<string> PlaySignals => _play.AsObservable();
-
-        private int _whenAnyThrottled1ProgressPercentage;
-        public int WhenAnyThrottled1ProgressPercentage
+        public int FirstProgressPercentage
         {
-            get => _whenAnyThrottled1ProgressPercentage;
+            get => _firstProgressPercentage;
             private set
             {
-                _whenAnyThrottled1ProgressPercentage = value;
+                _firstProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+        public int SecondProgressPercentage
+        {
+            get => _secondProgressPercentage;
+            private set
+            {
+                _secondProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+        public int ThirdProgressPercentage
+        {
+            get => _thirdProgressPercentage;
+            private set
+            {
+                _thirdProgressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
+        public int FourthProgressPercentage
+        {
+            get => _fourthProgressPercentage;
+            private set
+            {
+                _fourthProgressPercentage = value;
                 OnPropertyChanged();
             }
         }
 
-        private int _whenAnyThrottled2ProgressPercentage;
-        public int WhenAnyThrottled2ProgressPercentage
+        public string FirstBlock
         {
-            get => _whenAnyThrottled2ProgressPercentage;
-            private set
+            get => _firstBlock;
+            set
             {
-                _whenAnyThrottled2ProgressPercentage = value;
+                _firstBlock = value;
                 OnPropertyChanged();
             }
         }
 
-        private int _whenAnyThrottled3ProgressPercentage;
-        public int WhenAnyThrottled3ProgressPercentage
+        public string SecondBlock
         {
-            get => _whenAnyThrottled3ProgressPercentage;
-            private set
+            get => _secondBlock;
+            set
             {
-                _whenAnyThrottled3ProgressPercentage = value;
+                _secondBlock = value;
                 OnPropertyChanged();
             }
         }
 
-        private int _whenAnyThrottled4ProgressPercentage;
-        public int WhenAnyThrottled4ProgressPercentage
+        public string ThirdBlock
         {
-            get => _whenAnyThrottled4ProgressPercentage;
-            private set
+            get => _thirdBlock;
+            set
             {
-                _whenAnyThrottled4ProgressPercentage = value;
+                _thirdBlock = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string FourthBlock
+        {
+            get => _fourthBlock;
+            set
+            {
+                _fourthBlock = value;
                 OnPropertyChanged();
             }
         }
 
         public WhenAnyThrottledViewModel() : this(null) { }
 
-        public WhenAnyThrottledViewModel(IMediaPathService mediaPathService = null)
-        {
-            _mediaPathService = mediaPathService ?? new MediaPathService();
+        public WhenAnyThrottledViewModel(IPathService pathService = null) : base(pathService) { }
 
-            _1ProgressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAnyThrottled1ProgressPercentage = (int)p);
-            _2ProgressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAnyThrottled2ProgressPercentage = (int)p);
-            _3ProgressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAnyThrottled3ProgressPercentage = (int)p);
-            _4ProgressPercent.Sample(TimeSpan.FromMilliseconds(200)).Subscribe(p => WhenAnyThrottled4ProgressPercentage = (int)p);
-        }
-
-        private async Task ExecuteWhenAnyThrottled()
+        protected override async Task<string> ExecuteInternal()
         {
-            try
-            {
-                await ExecuteWhenAnyThrottledInternal();
-            }
-            catch (OperationCanceledException)
-            {
-                _info.OnNext(Notifcation.Clear);
-                _info.OnNext(Notifcation.Append("You've canceled the task, and you're now left with the following fully copied files:"));
-                var alreadyCopiedFilePaths = FileRetriever.GetFilePathsRecursively(_mediaPathService.Destination);
-                alreadyCopiedFilePaths.ForEach(path => _info.OnNext(Notifcation.Append(new FileInfo(path).Name)));
-            }
-        }
-
-        private async Task ExecuteWhenAnyThrottledInternal()
-        {
-            Task<string> BuildTask(string filePath)
-            {
-                var index = _currentlyReportingFiles.Count;
-                if (_currentlyReportingFiles.Count == 4)
+            var filePaths = new Queue<string>(FileRetriever.GetSortedFilePathsRecursively(PathService.Source));
+            var copyTasks = filePaths.Select((fp, i) =>
                 {
-                    var removable = _currentlyReportingFiles.Single(rf => rf.finished);
-                    index = removable.index;
-                    _currentlyReportingFiles.Remove(removable);
-                }
-
-                _currentlyReportingFiles.Add((filePath, index, false, 0));
-
-                var progress = new FileCopyProgress(ReportProgressWhenAnyThrottled);
-                return FileCopier.CopyFileAsync(filePath, _mediaPathService.Destination, progress, _whenAnyThrottledCancellationTokenSource.Token);
-            }
-
-            ClearOutDestinationFolder();
-            Directory.CreateDirectory(_mediaPathService.Destination);
-
-            var filePaths = new Queue<string>(FileRetriever.GetSortedFilePathsRecursively(_mediaPathService.Source));
-            var copyTasks = filePaths.Select(BuildTask)
-                                     .Take(BatchLevel)
-                                     .ToList();
+                    _currentlyReportingFiles.TryAdd(fp, (i, hasFinished: false, percent: 0));
+                    return BuildTask(fp);
+                })
+                .Take(BatchLevel)
+                .ToList();
 
             var finishedTask = Task.FromResult(string.Empty);
             while (copyTasks.Any())
             {
                 finishedTask = await Task.WhenAny(copyTasks);
+
+                if (finishedTask.IsCanceled)
+                    throw new TaskCanceledException();
+
                 copyTasks.Remove(finishedTask);
 
                 if (filePaths.Any())
-                    copyTasks.Add(BuildTask(filePaths.Dequeue()));
+                    copyTasks.Add(BuildNextTask(filePaths.Dequeue()));
             }
 
-            var currentFileBeingPlayed = finishedTask.Result;
-            _info.OnNext(Notifcation.Append("Playing: " + new FileInfo(currentFileBeingPlayed).Name));
-            _play.OnNext(currentFileBeingPlayed);
+            //Last task to finish
+            return finishedTask.Result;
         }
 
-        private bool CanExecuteWhenAnyThrottled()
+        private Task<string> BuildNextTask(string filePath)
         {
-            return !string.IsNullOrEmpty(_mediaPathService.Source);
+            var index = _currentlyReportingFiles.Count - 1;
+            if (_currentlyReportingFiles.Count == BatchLevel)
+            {
+                var finished = _currentlyReportingFiles.Single(kv => kv.Value.hasFinished);
+                index = finished.Value.index;
+                _currentlyReportingFiles.TryRemove(finished.Key, out _);
+            }
+
+            _currentlyReportingFiles.TryAdd(filePath, (index, hasFinished: false, percent: 0));
+
+            return BuildTask(filePath);
         }
 
-        private void CancelWhenAnyThrottled()
+        protected override void ReportProgressInternal((FileInfo fileInfo, decimal filePercentageCompleteIncrement, bool finished) progress)
         {
-            _whenAnyThrottledCancellationTokenSource.Cancel();
+            var value = progress.finished ? 100 : CumulatedProgressByFile[progress.fileInfo].percentage;
+            UpdateProgress(progress.fileInfo, value);
         }
 
-        private void ReportProgressWhenAnyThrottled((FileInfo fileInfo, decimal filePercentageCompleteIncrement, bool finished) progress)
+        protected override void ClearProgressInternal()
         {
-            _cumulatedProgressByFile.AddOrUpdate(
-                progress.fileInfo,
-                (progress.filePercentageCompleteIncrement, false),
-                (key, existing) => (existing.percentage + progress.filePercentageCompleteIncrement, progress.finished));
-
-            var value = progress.finished ? 100 : _cumulatedProgressByFile.Average(kv => kv.Value.percentage);
-            UpdateWhenAnyThrottledProgress(progress.fileInfo, value);
-
-            UpdateFileProgressInformation(progress);
+            _currentlyReportingFiles.Clear();
+            FirstProgressPercentage = 0;
+            SecondProgressPercentage = 0;
+            ThirdProgressPercentage = 0;
+            FourthProgressPercentage = 0;
         }
 
-        private void UpdateFileProgressInformation((FileInfo fileInfo, decimal percentage, bool hasFinished) progress)
+        private void UpdateProgress(FileInfo fileInfo, decimal value)
         {
-            var fileProgress = _cumulatedProgressByFile[progress.fileInfo];
-            var currentFileProgressInformation =
-                (progress.hasFinished
-                    ? "Finished downloading: "
-                    : $"Downloading ({fileProgress.percentage:N1} %): ")
-                + progress.fileInfo.Name;
-
-            _info.OnNext(Notifcation.Update(progress.fileInfo.Name, currentFileProgressInformation));
-        }
-
-        private void UpdateWhenAnyThrottledProgress(FileInfo fileInfo, decimal value)
-        {
-            var reportingFile = _currentlyReportingFiles.OrderByDescending(t => t.percent).First(t => t.filePath == fileInfo.FullName);
+            var reportingFile = _currentlyReportingFiles[fileInfo.FullName];
             var index = reportingFile.index;
 
             switch (index + 1)
             {
                 case 1:
-                    _1ProgressPercent.OnNext(value);
+                    FirstProgressPercentage = (int)value;
+                    FirstBlock = fileInfo.Name;
                     break;
                 case 2:
-                    _2ProgressPercent.OnNext(value);
+                    SecondProgressPercentage = (int)value;
+                    SecondBlock = fileInfo.Name;
                     break;
                 case 3:
-                    _3ProgressPercent.OnNext(value);
+                    ThirdProgressPercentage = (int)value;
+                    ThirdBlock = fileInfo.Name;
                     break;
                 case 4:
-                    _4ProgressPercent.OnNext(value);
+                    FourthProgressPercentage = (int)value;
+                    FourthBlock = fileInfo.Name;
                     break;
             }
 
             if (value == 100)
-                reportingFile.finished = true;
+                reportingFile.hasFinished = true;
 
-            _currentlyReportingFiles.Remove(reportingFile);
-            _currentlyReportingFiles.Add((reportingFile.filePath, reportingFile.index, reportingFile.finished, value));
-        }
-
-        private void ClearOutDestinationFolder()
-        {
-            if (string.IsNullOrEmpty(_mediaPathService.Destination) || !Directory.Exists(_mediaPathService.Destination))
-                return;
-
-            foreach (var file in Directory.GetFiles(_mediaPathService.Destination))
-            {
-                File.Delete(file);
-            }
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            _currentlyReportingFiles.TryRemove(fileInfo.FullName, out _);
+            _currentlyReportingFiles.TryAdd(fileInfo.FullName, (reportingFile.index, reportingFile.hasFinished, value));
         }
     }
 }

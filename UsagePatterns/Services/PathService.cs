@@ -1,11 +1,13 @@
 ﻿using AsyncWorkshop.UsagePatterns.Helpers;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace AsyncWorkshop.UsagePatterns.Services
 {
-    public class MediaPathService : IMediaPathService
+    public class PathService : IPathService
     {
         private string _source = @"D:\Projects - Extra\Workshop\workshop-async\media";
         public string Source
@@ -26,7 +28,9 @@ namespace AsyncWorkshop.UsagePatterns.Services
             }
         }
 
-        public string Destination { get; } = Path.Combine(Path.GetTempPath(), "CopiedMediaForAsyncWorkshop");
+        public string Destination { get; } = Path.Combine(Environment.CurrentDirectory, "Copies");
+
+        public string Utility { get; } = Path.Combine(Environment.CurrentDirectory, "Utility");
 
         public void ClearDestination()
         {
@@ -37,6 +41,19 @@ namespace AsyncWorkshop.UsagePatterns.Services
             {
                 File.Delete(file);
             }
+        }
+
+        public void ClearStandByList()
+        {
+            if (string.IsNullOrWhiteSpace(Utility) || !Directory.Exists(Utility))
+                return;
+
+            var utilityPath = Path.Combine(Utility, "EmptyStandbyList.exe");
+            if (!File.Exists(utilityPath))
+                return;
+
+            Process.Start(utilityPath, "standbylist");
+            Thread.Sleep(1000);
         }
 
         private static bool ContainsMusicFiles(string path)

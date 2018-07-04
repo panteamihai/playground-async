@@ -6,27 +6,29 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
 {
     public class ConfigurationViewModel : INotifyPropertyChanged
     {
-        private readonly IMediaPathService _mediaPathService;
+        private readonly IPathService _pathService;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string MediaSourcePath
         {
-            get => _mediaPathService.Source;
+            get => _pathService.Source;
             set
             {
-                _mediaPathService.Source = value;
+                _pathService.Source = value;
                 OnPropertyChanged();
             }
         }
 
-        public string MediaDestinationPath => _mediaPathService.Destination;
+        public string MediaDestinationPath => _pathService.Destination;
+
+        public string UtilityPath => _pathService.Utility;
 
         public ConfigurationViewModel() : this(null) { }
 
-        public ConfigurationViewModel(IMediaPathService mediaPathService = null)
+        public ConfigurationViewModel(IPathService pathService = null)
         {
-            _mediaPathService = mediaPathService ?? new MediaPathService();
+            _pathService = pathService ?? new PathService();
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

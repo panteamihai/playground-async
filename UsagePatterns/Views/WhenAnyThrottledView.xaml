@@ -13,25 +13,64 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <StackPanel Orientation="Horizontal">
-        <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteWhenAnyThrottledCommand}" Style="{StaticResource DisappearableButton}" Content="Download in batches"/>
-        <Button Height="30" Margin="5" Padding="5" Command="{Binding CancelWhenAnyThrottledCommand}" Style="{StaticResource DisappearableButton}" Content="Cancel download"/>
-        <StackPanel>
+        <Button Height="30" Margin="5" Padding="5" Command="{Binding ExecuteCommand}" Style="{StaticResource DisappearableButton}" Content="Batch download"/>
+        <Button Height="30" Margin="5" Padding="5" Command="{Binding CancelCommand}" Style="{StaticResource DisappearableButton}" Content="Cancel download"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <ProgressBar
-                x:Name="ProgressBarWhenAnyThrottled_1"
+                Grid.Row="1"
+                Grid.Column="0"
+                x:Name="FirstProgress"
                 Height="30" Width="346"
-                Value="{Binding WhenAnyThrottled1ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                Value="{Binding FirstProgressPercentage, Mode=OneWay}" VerticalAlignment="Top"/>
+            <TextBlock
+                Grid.Row="1"
+                Grid.Column="1"
+                Text="{Binding FirstBlock, Mode=OneWay}"
+                VerticalAlignment="Center" />
             <ProgressBar
-                x:Name="ProgressBarWhenAnyThrottled_2"
+                Grid.Row="2"
+                Grid.Column="0"
+                x:Name="SecondProgress"
                 Height="30" Width="346"
-                Value="{Binding WhenAnyThrottled2ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                Value="{Binding SecondProgressPercentage, Mode=OneWay}" VerticalAlignment="Top"/>
+            <TextBlock
+                Grid.Row="2"
+                Grid.Column="1"
+                Text="{Binding SecondBlock, Mode=OneWay}"
+                VerticalAlignment="Center" />
             <ProgressBar
-                x:Name="ProgressBarWhenAnyThrottled_3"
+                Grid.Row="3"
+                Grid.Column="0"
+                x:Name="ThirdProgress"
                 Height="30" Width="346"
-                Value="{Binding WhenAnyThrottled3ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
+                Value="{Binding ThirdProgressPercentage, Mode=OneWay}" VerticalAlignment="Top"/>
+            <TextBlock
+                Grid.Row="3"
+                Grid.Column="1"
+                Text="{Binding ThirdBlock, Mode=OneWay}"
+                VerticalAlignment="Center" />
             <ProgressBar
-                x:Name="ProgressBarWhenAnyThrottled_4"
-                Height="30" Width="346"
-                Value="{Binding WhenAnyThrottled4ProgressPercentage, Mode=OneWay}" Margin="0,5,0,5"/>
-        </StackPanel>
+                Grid.Row="4"
+                Grid.Column="0"
+                x:Name="FourthProgress" Width="346"
+                Value="{Binding FourthProgressPercentage, Mode=OneWay}" />
+            <TextBlock
+                Grid.Row="4"
+                Grid.Column="1"
+                Text="{Binding FourthBlock, Mode=OneWay}"
+                VerticalAlignment="Center" />
+        </Grid>
     </StackPanel>
 </UserControl>

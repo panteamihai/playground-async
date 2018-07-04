@@ -17,7 +17,7 @@
 
 The following functionalities, captured in the [UsagePatterns project] are all taken and extended from [Liam Westley]'s brilliant NDC London 2014 talk [Async C# 5.0 - Patterns For Real World Use] so props to him for a great presentation and source material, check out his [original implementation]. The [demo album] of the featured band, Silents, must be downloaded in all formats (m4a, flac, mp3, ogg) and placed in the root repo folder inside a folder called media, or the path to the location of the download needs to be adjusted in the [MediaService implementation].
 
-Also note that [clearing the Windows file cache] is essential for running this project under Windows multiple times (for now at least).
+Also note that [clearing the Windows file cache] is essential for running this project under Windows multiple times (for now at least). You could run the solution / exe **as an admin** and make use of the *[Empty Standby List]* tool by placing it in the Utility folder for the task to be automated.
 
 ## Progress reporting
 
@@ -39,6 +39,9 @@ Stephen Cleary - [Reporting Progress from Async Tasks]
 ## Throttling
 * Use a [fixed size buffer] for running a set number of tasks at a time.
 * Show the progress by assigning each running task one specific bar to constantly update with new info.
+* Allow for cancellation
+
+### Remove duplication in view models by introducing [a base class]
 
 [Reporting Progress from Async Tasks]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
 [incremental]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
@@ -49,4 +52,6 @@ Stephen Cleary - [Reporting Progress from Async Tasks]
 [original implementation]: <https://github.com/westleyl/NDCOslo-AsyncPatterns>
 [demo album]: <https://silents.bandcamp.com/>
 [MediaService implementation]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/Services/MediaPathService.cs#L10>
-[fixed size buffer]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyThrottledViewModel.cs#L148>
+[fixed size buffer]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyThrottledViewModel.cs#L118>
+[Empty Standby List]: <https://wj32.org/wp/software/empty-standby-list/>
+[a base class]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/OperationViewModel.cs>

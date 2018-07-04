@@ -17,9 +17,9 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
 
         public UsagePatternsViewModel() : this(null) { }
 
-        public UsagePatternsViewModel(IMediaPathService mps = null)
+        public UsagePatternsViewModel(IPathService mps = null)
         {
-            var mediaPathService = mps ?? new MediaPathService();
+            var mediaPathService = mps ?? new PathService();
 
             ConfigurationViewModel = new ConfigurationViewModel(mediaPathService);
             WhenAllViewModel = new WhenAllViewModel(mediaPathService);
