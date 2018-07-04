@@ -10,7 +10,9 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
     {
         public ConfigurationViewModel ConfigurationViewModel { get; }
         public WhenAllViewModel WhenAllViewModel { get; }
-        public WhenAnyThrottledViewModel WhenAnyThrottledViewModel { get; }
+        public WhenAnyViewModel WhenAnyThrottledViewModel { get; }
+        public WhenAnyViewModel WhenAnyFirstWinsViewModel { get; }
+        public WhenAnyViewModel WhenAnyEarlyBailoutViewModel { get; }
 
         public IObservable<string> PlaySignals { get; }
         public ObservableCollection<string> FileProgressInformation { get; } = new ObservableCollection<string>();
@@ -24,12 +26,23 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
             ConfigurationViewModel = new ConfigurationViewModel(mediaPathService);
             WhenAllViewModel = new WhenAllViewModel(mediaPathService);
             WhenAnyThrottledViewModel = new WhenAnyThrottledViewModel(mediaPathService);
+            WhenAnyFirstWinsViewModel = new WhenAnyFirstWinsViewModel(mediaPathService);
+            WhenAnyEarlyBailoutViewModel = new WhenAnyEarlyBailoutViewModel();
 
-            PlaySignals = WhenAllViewModel.PlaySignals.Merge(WhenAnyThrottledViewModel.PlaySignals);
-            WhenAllViewModel.Info.Merge(WhenAnyThrottledViewModel.Info).Subscribe(UpdateFileProgressInformation);
+            PlaySignals = Observable.Merge(
+                WhenAllViewModel.PlaySignals,
+                WhenAnyThrottledViewModel.PlaySignals,
+                WhenAnyFirstWinsViewModel.PlaySignals,
+                WhenAnyEarlyBailoutViewModel.PlaySignals);
+            Observable.Merge(
+                        WhenAllViewModel.Info,
+                        WhenAnyThrottledViewModel.Info,
+                        WhenAnyFirstWinsViewModel.Info,
+                        WhenAnyEarlyBailoutViewModel.Info)
+                      .Subscribe(UpdateFileProgressInformation);
         }
 
-        private void UpdateFileProgressInformation(Notifcation notification)
+        private void UpdateFileProgressInformation(Notification notification)
         {
             switch (notification.Type)
             {

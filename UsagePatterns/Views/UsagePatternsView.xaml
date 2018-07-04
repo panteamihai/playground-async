@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:AsyncWorkshop.UsagePatterns.Views"
         mc:Ignorable="d"
         DataContext="{StaticResource UsagePatternsViewModel}"
-        Height="538" Width="614">
+        Height="538" Width="746">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -28,8 +28,14 @@
             <TabItem Header="WhenAll">
                 <views:WhenAllView DataContext="{Binding WhenAllViewModel}" />
             </TabItem>
-            <TabItem Header="WhenAny - Throttled" IsSelected="True">
-                <views:WhenAnyThrottledView DataContext="{Binding WhenAnyThrottledViewModel}" />
+            <TabItem Header="WhenAny - Throttled">
+                <views:WhenAnyView DataContext="{Binding WhenAnyThrottledViewModel}" />
+            </TabItem>
+            <TabItem Header="WhenAny - First Wins">
+                <views:WhenAnyView DataContext="{Binding WhenAnyFirstWinsViewModel}" />
+            </TabItem>
+            <TabItem Header="WhenAny - Early Bailout" IsSelected="True">
+                <views:WhenAnyView DataContext="{Binding WhenAnyEarlyBailoutViewModel}" />
             </TabItem>
         </TabControl>
         <ListView Grid.Row="2" x:Name="TaskOutput" ItemsSource="{Binding FileProgressInformation}" Margin="0,20,0,0">

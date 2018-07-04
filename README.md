@@ -43,6 +43,12 @@ Stephen Cleary - [Reporting Progress from Async Tasks]
 
 ### Remove duplication in view models by introducing [a base class]
 
+## First wins, early bailout
+* Cancel all running tasks when the first one is ready
+* Cancel all running tasks if a validation on one's result fails
+
+### Introduce [a base for all WhenAny] operations
+
 [Reporting Progress from Async Tasks]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
 [incremental]: <https://blog.stephencleary.com/2012/02/reporting-progress-from-async-tasks.html>
 [clearing the Windows file cache]: <https://stackoverflow.com/questions/478340/clear-file-cache-to-repeat-performance-testing>
@@ -52,6 +58,7 @@ Stephen Cleary - [Reporting Progress from Async Tasks]
 [original implementation]: <https://github.com/westleyl/NDCOslo-AsyncPatterns>
 [demo album]: <https://silents.bandcamp.com/>
 [MediaService implementation]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/Services/MediaPathService.cs#L10>
-[fixed size buffer]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyThrottledViewModel.cs#L118>
+[fixed size buffer]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyViewModel.cs#L157>
 [Empty Standby List]: <https://wj32.org/wp/software/empty-standby-list/>
 [a base class]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/OperationViewModel.cs>
+[a base for all WhenAny]: <https://github.com/panteamihai/workshop-async/blob/master/UsagePatterns/ViewModels/WhenAnyViewModel.cs>

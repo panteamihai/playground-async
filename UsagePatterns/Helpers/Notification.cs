@@ -9,13 +9,13 @@ namespace AsyncWorkshop.UsagePatterns.Helpers
         Update
     }
 
-    public class Notifcation
+    public class Notification
     {
-        public static Notifcation Clear { get; } = new Notifcation(NotifcationType.Clear);
+        public static Notification Clear { get; } = new Notification(NotifcationType.Clear);
 
-        public static Func<string, Notifcation> Append = message => new Notifcation(NotifcationType.Append, message);
+        public static Func<string, Notification> Append = message => new Notification(NotifcationType.Append, message);
 
-        public static Func<string, string, Notifcation> Update = (identifier, update) => new Notifcation(NotifcationType.Update, update, identifier);
+        public static Func<string, string, Notification> Update = (identifier, update) => new Notification(NotifcationType.Update, update, identifier);
 
         public NotifcationType Type { get; }
 
@@ -23,7 +23,7 @@ namespace AsyncWorkshop.UsagePatterns.Helpers
 
         public string Message { get; }
 
-        private Notifcation(NotifcationType type, string message = null, string id = null)
+        private Notification(NotifcationType type, string message = null, string id = null)
         {
             Type = type;
             Id = id;

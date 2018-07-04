@@ -3,11 +3,11 @@
 namespace AsyncWorkshop.UsagePatterns.Views
 {
     /// <summary>
-    /// Interaction logic for WhenAllView.xaml
+    /// Interaction logic for WhenAnyView.xaml
     /// </summary>
-    public partial class WhenAllView : UserControl
+    public partial class WhenAnyView : UserControl
     {
-        public WhenAllView()
+        public WhenAnyView()
         {
             InitializeComponent();
         }

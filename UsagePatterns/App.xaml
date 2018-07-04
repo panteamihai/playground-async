@@ -8,5 +8,7 @@
         <viewModels:ConfigurationViewModel x:Key="ConfigurationViewModel" />
         <viewModels:WhenAllViewModel x:Key="WhenAllViewModel" />
         <viewModels:WhenAnyThrottledViewModel x:Key="WhenAnyThrottledViewModel" />
+        <viewModels:WhenAnyFirstWinsViewModel x:Key="WhenAnyFirstWinsViewModel" />
+        <viewModels:WhenAnyEarlyBailoutViewModel x:Key="WhenAnyEarlyBailoutViewModel" />
     </Application.Resources>
 </Application>

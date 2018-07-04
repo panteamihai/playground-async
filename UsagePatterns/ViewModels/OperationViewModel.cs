@@ -24,13 +24,13 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
         private SequentialBoundRelayCommand _cancelCommand;
 
         private readonly Subject<string> _play = new Subject<string>();
-        private readonly Subject<Notifcation> _info = new Subject<Notifcation>();
+        private readonly Subject<Notification> _info = new Subject<Notification>();
 
         protected CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
         protected readonly IPathService PathService;
         protected readonly CumulatedProgressByFile CumulatedProgressByFile = new CumulatedProgressByFile();
 
-        public IObservable<Notifcation> Info => _info.AsObservable();
+        public IObservable<Notification> Info => _info.AsObservable();
 
         public IObservable<string> PlaySignals => _play.AsObservable();
 
@@ -59,11 +59,16 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
             {
                 HandleCancellation();
             }
+            catch(Exception ex)
+            {
+                _info.OnNext(Notification.Append("Something went really wrong!"));
+                _info.OnNext(Notification.Append(ex.Message));
+            }
         }
 
         private void ResetState()
         {
-            _info.OnNext(Notifcation.Clear);
+            _info.OnNext(Notification.Clear);
             CancellationTokenSource = new CancellationTokenSource();
 
             PathService.ClearDestination();
@@ -86,10 +91,10 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
 
         private void HandleCancellation()
         {
-            _info.OnNext(Notifcation.Clear);
-            _info.OnNext(Notifcation.Append("You've canceled the task, and you're now left with the following fully copied files:"));
+            _info.OnNext(Notification.Clear);
+            _info.OnNext(Notification.Append("You've canceled the task, and you're now left with the following fully copied files:"));
             var alreadyCopiedFilePaths = FileRetriever.GetFilePathsRecursively(PathService.Destination);
-            alreadyCopiedFilePaths.ForEach(path => _info.OnNext(Notifcation.Append(new FileInfo(path).Name)));
+            alreadyCopiedFilePaths.ForEach(path => _info.OnNext(Notification.Append(new FileInfo(path).Name)));
         }
 
         protected bool CanExecute()
@@ -104,13 +109,15 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
 
         protected void ReportProgress((FileInfo fileInfo, decimal filePercentageCompleteIncrement, bool finished) progress)
         {
+            if (CancellationTokenSource.IsCancellationRequested)
+                return;
+
             CumulatedProgressByFile.AddOrUpdate(
                 progress.fileInfo,
                 (progress.filePercentageCompleteIncrement, false),
                 (key, existing) => (existing.percentage + progress.filePercentageCompleteIncrement, progress.finished));
 
             ReportProgressInternal(progress);
-
             UpdateFileProgressInformation(progress);
         }
 
@@ -125,12 +132,12 @@ namespace AsyncWorkshop.UsagePatterns.ViewModels
                     : $"Downloading ({fileProgress.percentage:N1} %): ")
                 + progress.fileInfo.Name;
 
-            _info.OnNext(Notifcation.Update(progress.fileInfo.Name, currentFileProgressInformation));
+            _info.OnNext(Notification.Update(progress.fileInfo.Name, currentFileProgressInformation));
         }
 
         private void StartPlaying(string currentFileBeingPlayed)
         {
-            _info.OnNext(Notifcation.Append("Playing: " + new FileInfo(currentFileBeingPlayed).Name));
+            _info.OnNext(Notification.Append("Playing: " + new FileInfo(currentFileBeingPlayed).Name));
             _play.OnNext(currentFileBeingPlayed);
         }
 

@@ -68,11 +68,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\FileHasher.cs" />
     <Compile Include="Helpers\Notification.cs" />
     <Compile Include="Services\IPathService.cs" />
     <Compile Include="Services\PathService.cs" />
     <Compile Include="ViewModels\OperationViewModel.cs" />
     <Compile Include="ViewModels\WhenAllViewModel.cs" />
+    <Compile Include="ViewModels\WhenAnyEarlyBailoutViewModel.cs" />
+    <Compile Include="ViewModels\WhenAnyViewModel.cs" />
+    <Compile Include="ViewModels\WhenAnyFirstWinsViewModel.cs" />
     <Compile Include="ViewModels\WhenAnyThrottledViewModel.cs" />
     <Compile Include="Views\ConfigurationView.xaml.cs">
       <DependentUpon>ConfigurationView.xaml</DependentUpon>
@@ -87,8 +91,8 @@
     <Compile Include="Views\WhenAllView.xaml.cs">
       <DependentUpon>WhenAllView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\WhenAnyThrottledView.xaml.cs">
-      <DependentUpon>WhenAnyThrottledView.xaml</DependentUpon>
+    <Compile Include="Views\WhenAnyView.xaml.cs">
+      <DependentUpon>WhenAnyView.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\ConfigurationView.xaml">
       <SubType>Designer</SubType>
@@ -114,7 +118,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\WhenAnyThrottledView.xaml">
+    <Page Include="Views\WhenAnyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
