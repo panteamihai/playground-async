@@ -9,7 +9,7 @@ namespace AsyncWorkshop.UsagePatterns.Services
 {
     public class PathService : IPathService
     {
-        private string _source = @"D:\Projects - Extra\Workshop\workshop-async\media";
+        private string _source = @"D:\Development\Leisure\playground-async\media";
         public string Source
         {
             get => _source;
