@@ -1,5 +1,18 @@
 # Asynchronous Programming
 
+## Why the need for async
+
+Some things take a long time to finish: downloading a 400MB file, processing the individual bits of a huge bitmap.
+Why a `Task` and not a `Thread` for asynchronous ops: a Thread can't return a result (it can write to some shared memory), can't be cancelled, doesn't play nice with other threads by nature (always races), has a lot of overhead (a lot).
+
+* Cpu-bound vs. I/O bound 
+* Use existing framework/library sources of asynchrony or create your own with Task.Run`
+* Long-running tasks: thread depletion in the ThreadPool.
+
+## Basics - Console behavior
+
+* 
+
 ## Basics - Error handling
 
 * So what is up with `async void` methods and error handling?
